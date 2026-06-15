@@ -1,0 +1,1148 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>2026 世足勝率分析</title>
+  <style>
+    :root {
+      --ink: #17211f;
+      --muted: #66736f;
+      --line: #d9e1dd;
+      --bg: #f5f7f4;
+      --panel: #ffffff;
+      --green: #0e7c66;
+      --teal: #1ca39a;
+      --blue: #2c5f9e;
+      --gold: #d99b21;
+      --red: #c75146;
+      --shadow: 0 14px 34px rgba(31, 45, 42, .10);
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--ink);
+      font-family: "Microsoft JhengHei", "Noto Sans TC", system-ui, -apple-system, sans-serif;
+      background:
+        radial-gradient(circle at top left, rgba(28, 163, 154, .14), transparent 32rem),
+        linear-gradient(180deg, #f7faf7 0%, var(--bg) 58%, #edf2ef 100%);
+    }
+
+    header {
+      padding: 28px clamp(16px, 3vw, 42px) 18px;
+      border-bottom: 1px solid var(--line);
+      background: rgba(255, 255, 255, .72);
+      backdrop-filter: blur(14px);
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    .topbar {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 18px;
+      align-items: end;
+      max-width: 1600px;
+      margin: 0 auto;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(1.65rem, 3vw, 3.2rem);
+      line-height: 1.08;
+      letter-spacing: 0;
+    }
+
+    .subtitle {
+      max-width: 900px;
+      margin: 10px 0 0;
+      color: var(--muted);
+      line-height: 1.65;
+      font-size: .98rem;
+    }
+
+    .stamp {
+      padding: 10px 14px;
+      border: 1px solid var(--line);
+      background: var(--panel);
+      border-radius: 8px;
+      color: var(--muted);
+      min-width: 248px;
+      box-shadow: var(--shadow);
+      font-size: .9rem;
+    }
+
+    main {
+      max-width: 1600px;
+      margin: 0 auto;
+      padding: 22px clamp(16px, 3vw, 42px) 42px;
+    }
+
+    .toolbar {
+      display: grid;
+      grid-template-columns: minmax(240px, 1.2fr) repeat(3, minmax(160px, .6fr));
+      gap: 10px;
+      margin-bottom: 18px;
+    }
+
+    input, select, button {
+      width: 100%;
+      border: 1px solid var(--line);
+      background: #fff;
+      color: var(--ink);
+      border-radius: 8px;
+      padding: 11px 12px;
+      font: inherit;
+      min-height: 44px;
+    }
+
+    button {
+      cursor: pointer;
+      background: var(--ink);
+      color: white;
+      border-color: var(--ink);
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(150px, 1fr));
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .metric {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 14px;
+      box-shadow: var(--shadow);
+    }
+
+    .metric strong {
+      display: block;
+      font-size: 1.55rem;
+      margin-bottom: 3px;
+    }
+
+    .metric span { color: var(--muted); font-size: .86rem; }
+
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1.1fr) minmax(420px, .9fr);
+      gap: 18px;
+      align-items: start;
+    }
+
+    section {
+      background: rgba(255, 255, 255, .74);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .section-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 14px;
+      align-items: center;
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--line);
+      background: rgba(255, 255, 255, .8);
+    }
+
+    h2 {
+      margin: 0;
+      font-size: 1.02rem;
+      letter-spacing: 0;
+    }
+
+    .hint {
+      color: var(--muted);
+      font-size: .84rem;
+      text-align: right;
+    }
+
+    .groups {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+      padding: 12px;
+    }
+
+    .group {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      overflow: hidden;
+    }
+
+    .group-title {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 12px;
+      background: #eef5f1;
+      border-bottom: 1px solid var(--line);
+      font-weight: 700;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: .88rem;
+    }
+
+    th, td {
+      padding: 9px 8px;
+      border-bottom: 1px solid #edf1ef;
+      text-align: left;
+      vertical-align: middle;
+      white-space: nowrap;
+    }
+
+    th {
+      color: var(--muted);
+      font-size: .74rem;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    tr:last-child td { border-bottom: 0; }
+    .team-name { font-weight: 700; min-width: 90px; }
+    .num { text-align: right; font-variant-numeric: tabular-nums; }
+    .status {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 4px 8px;
+      font-size: .75rem;
+      color: var(--muted);
+      background: #fff;
+    }
+    .status::before {
+      content: "";
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--muted);
+    }
+    .done::before { background: var(--green); }
+    .live::before { background: var(--gold); }
+    .soon::before { background: var(--blue); }
+
+    .bar {
+      height: 8px;
+      width: 100%;
+      min-width: 72px;
+      background: #e9eeeb;
+      border-radius: 99px;
+      overflow: hidden;
+    }
+
+    .bar i {
+      display: block;
+      height: 100%;
+      width: var(--w);
+      background: linear-gradient(90deg, var(--teal), var(--blue));
+      border-radius: inherit;
+    }
+
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+      padding: 12px;
+    }
+
+    .team-card {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      padding: 12px;
+    }
+
+    .team-card .row {
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+      align-items: baseline;
+      margin-bottom: 10px;
+    }
+
+    .badge {
+      font-size: .74rem;
+      color: #fff;
+      background: var(--green);
+      border-radius: 999px;
+      padding: 4px 8px;
+      white-space: nowrap;
+    }
+
+    .team-card h3 {
+      margin: 0;
+      font-size: 1rem;
+    }
+
+    .small {
+      color: var(--muted);
+      font-size: .78rem;
+      line-height: 1.45;
+    }
+
+    .split {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      margin: 10px 0;
+    }
+
+    .pill {
+      background: #f3f6f4;
+      border-radius: 8px;
+      padding: 8px;
+      text-align: center;
+      font-size: .76rem;
+      color: var(--muted);
+    }
+
+    .pill strong {
+      display: block;
+      color: var(--ink);
+      font-size: .98rem;
+      margin-bottom: 2px;
+    }
+
+    .matches {
+      padding: 12px;
+      display: grid;
+      gap: 8px;
+    }
+
+    .match {
+      display: grid;
+      grid-template-columns: 72px 1fr 74px;
+      gap: 10px;
+      align-items: center;
+      padding: 10px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      font-size: .86rem;
+    }
+
+    .score {
+      font-weight: 800;
+      text-align: center;
+      font-variant-numeric: tabular-nums;
+      color: var(--green);
+    }
+
+    .bracket-wrap {
+      padding: 12px;
+      overflow-x: auto;
+    }
+
+    .bracket {
+      min-width: 1180px;
+      display: grid;
+      grid-template-columns: 1.55fr 1.1fr repeat(6, minmax(130px, .78fr));
+      gap: 10px;
+      align-items: stretch;
+      min-height: 780px;
+    }
+
+    .round {
+      display: grid;
+      gap: var(--gap);
+      align-content: center;
+    }
+
+    .round:nth-child(1) { --gap: 8px; }
+    .round:nth-child(2) { --gap: 18px; }
+    .round:nth-child(3) { --gap: 42px; }
+    .round:nth-child(4) { --gap: 88px; }
+    .round:nth-child(5) { --gap: 120px; }
+
+    .slot {
+      min-height: 48px;
+      border: 1px solid var(--line);
+      background: #fff;
+      border-radius: 8px;
+      padding: 8px 10px;
+      display: grid;
+      align-content: center;
+      position: relative;
+    }
+
+    .slot::after {
+      content: "";
+      position: absolute;
+      right: -13px;
+      top: 50%;
+      width: 12px;
+      border-top: 1px solid #bfcac5;
+    }
+
+    .round:last-child .slot::after { display: none; }
+    .slot b { font-size: .82rem; }
+    .slot span { color: var(--muted); font-size: .72rem; margin-top: 2px; }
+    .final {
+      background: linear-gradient(135deg, #fffaf0, #ffffff);
+      border-color: rgba(217, 155, 33, .55);
+    }
+
+    .tree-column {
+      display: grid;
+      align-content: start;
+      gap: 8px;
+      max-height: 820px;
+      overflow: auto;
+      padding-right: 2px;
+    }
+
+    .round-head {
+      position: sticky;
+      top: 0;
+      z-index: 1;
+      padding: 8px 9px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #eef5f1;
+      font-weight: 800;
+      font-size: .78rem;
+    }
+
+    .tree-match {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      padding: 8px;
+      font-size: .76rem;
+      line-height: 1.35;
+    }
+
+    .tree-match strong {
+      display: block;
+      font-size: .78rem;
+      margin-bottom: 3px;
+    }
+
+    .tree-score {
+      display: inline-flex;
+      gap: 5px;
+      align-items: center;
+      color: var(--green);
+      font-weight: 800;
+      margin-top: 4px;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .winner-line {
+      color: var(--green);
+      font-weight: 800;
+    }
+
+    .predicted-line {
+      color: var(--blue);
+      font-weight: 800;
+    }
+
+    .bracket {
+      min-width: 1120px;
+      display: block;
+      min-height: 0;
+    }
+
+    .actual-bracket {
+      width: 100%;
+      min-width: 1120px;
+      height: auto;
+      display: block;
+      background: #f7f6f3;
+      border: 1px solid #e2e0dc;
+      border-radius: 8px;
+    }
+
+    .bracket-line {
+      fill: none;
+      stroke: #aeb5b1;
+      stroke-width: 1.25;
+    }
+
+    .bracket-box {
+      fill: #f2f3f2;
+      stroke: #bfc5c2;
+      stroke-width: 1;
+    }
+
+    .bracket-round {
+      fill: #4f5d59;
+      font-size: 10px;
+      font-weight: 700;
+    }
+
+    .bracket-text {
+      fill: #17211f;
+      font-size: 11px;
+      font-weight: 700;
+      dominant-baseline: middle;
+      text-anchor: middle;
+    }
+
+    .bracket-subtext {
+      fill: #66736f;
+      font-size: 8px;
+      dominant-baseline: middle;
+      text-anchor: middle;
+    }
+
+    .fixture-power {
+      margin-top: 12px;
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    .full-match-tree {
+      display: grid;
+      grid-template-columns: minmax(560px, 1.25fr) minmax(260px, .65fr) minmax(340px, .8fr);
+      gap: 14px;
+      align-items: start;
+      min-width: 1180px;
+    }
+
+    .tree-stage {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #f7f6f3;
+      padding: 12px;
+      position: relative;
+    }
+
+    .tree-stage h3 {
+      margin: 0 0 10px;
+      font-size: .92rem;
+    }
+
+    .group-tree-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .group-tree {
+      border: 1px solid #d8ddd9;
+      border-radius: 8px;
+      background: #fff;
+      padding: 8px;
+    }
+
+    .group-tree-title {
+      font-weight: 800;
+      font-size: .82rem;
+      margin-bottom: 6px;
+      color: var(--green);
+    }
+
+    .match-node {
+      border: 1px solid #cfd6d2;
+      border-radius: 6px;
+      background: #f4f6f5;
+      padding: 7px;
+      margin: 6px 0;
+      font-size: .74rem;
+      line-height: 1.38;
+      position: relative;
+    }
+
+    .match-node.done {
+      border-color: rgba(14, 124, 102, .45);
+      background: #eff8f5;
+    }
+
+    .match-node.live {
+      border-color: rgba(217, 155, 33, .55);
+      background: #fff8e8;
+    }
+
+    .node-id {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 42px;
+      height: 20px;
+      border-radius: 999px;
+      background: var(--ink);
+      color: #fff;
+      font-size: .68rem;
+      font-weight: 800;
+      margin-right: 6px;
+    }
+
+    .rank-node {
+      border: 1px solid #d8ddd9;
+      border-radius: 8px;
+      background: #fff;
+      padding: 9px;
+      margin-bottom: 8px;
+      font-size: .77rem;
+      line-height: 1.45;
+    }
+
+    .ko-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    .ko-node {
+      min-height: 58px;
+      border: 1px solid #cfd6d2;
+      border-radius: 6px;
+      background: #fff;
+      padding: 8px;
+      font-size: .74rem;
+      line-height: 1.35;
+    }
+
+    .ko-node.final-node {
+      border-color: rgba(217, 155, 33, .6);
+      background: #fffaf0;
+    }
+
+    .sources {
+      margin-top: 18px;
+      color: var(--muted);
+      font-size: .82rem;
+      line-height: 1.55;
+    }
+
+    a { color: var(--blue); }
+
+    @media (max-width: 1180px) {
+      .layout { grid-template-columns: 1fr; }
+      .cards { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .stats { grid-template-columns: repeat(3, 1fr); }
+    }
+
+    @media (max-width: 760px) {
+      header { position: static; }
+      .topbar, .toolbar, .groups, .cards, .stats { grid-template-columns: 1fr; }
+      .stamp { min-width: 0; }
+      .section-head { display: block; }
+      .hint { text-align: left; margin-top: 6px; }
+      th:nth-child(4), td:nth-child(4), th:nth-child(5), td:nth-child(5) { display: none; }
+      .match { grid-template-columns: 1fr; }
+      .score { text-align: left; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="topbar">
+      <div>
+        <h1>2026 世足賽每隊勝率與戰力分析</h1>
+        <p class="subtitle">以已完賽結果、現場進行中賽事、未賽賽程，加上徵招球員總值層級、歷史大賽表現與近期實力做 1-10 戰力指數。勝率為模型估算，用來輔助觀察，不是賽果保證。</p>
+      </div>
+      <div class="stamp">
+        <strong>資料快照</strong><br>
+        2026-06-15 10:55 台北時間<br>
+        已完賽 11 場，進行中 1 場，未賽 60 場
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <div class="toolbar" aria-label="篩選工具列">
+      <input id="search" type="search" placeholder="搜尋隊伍，例如 Brazil、德國、日本">
+      <select id="groupFilter">
+        <option value="all">全部分組</option>
+      </select>
+      <select id="sortBy">
+        <option value="champ">依奪冠率排序</option>
+        <option value="power">依戰力排序</option>
+        <option value="group">依小組出線率排序</option>
+      </select>
+      <button id="reset">重設</button>
+    </div>
+
+    <div class="stats" id="stats"></div>
+
+    <div class="layout">
+      <div>
+        <section>
+          <div class="section-head">
+            <h2>分組即時表</h2>
+            <div class="hint">Pts / GD 來自目前輸入賽果；未賽隊伍仍以預估戰力排序</div>
+          </div>
+          <div class="groups" id="groups"></div>
+        </section>
+
+        <section style="margin-top:18px;">
+          <div class="section-head">
+            <h2>每隊戰力卡</h2>
+            <div class="hint">總值、歷史、近期與賽事調整加權後轉成 1-10 分</div>
+          </div>
+          <div class="cards" id="teamCards"></div>
+        </section>
+      </div>
+
+      <div>
+        <section>
+          <div class="section-head">
+            <h2>實際對戰樹狀圖</h2>
+            <div class="hint">只依實際結果推進；未產生對手或未完賽不做預測</div>
+          </div>
+          <div class="bracket-wrap">
+            <div class="bracket" id="bracket"></div>
+          </div>
+        </section>
+
+        <section style="margin-top:18px;">
+          <div class="section-head">
+            <h2>賽事狀態</h2>
+            <div class="hint">已完賽、現場進行中與未開賽混合呈現</div>
+          </div>
+          <div class="matches" id="matches"></div>
+        </section>
+      </div>
+    </div>
+
+    <p class="sources">
+      來源：賽制、參賽隊伍與賽程參考 FIFA / Wikipedia 資料頁；6 月 14 日賽果與 6 月 15 日瑞典對突尼西亞即時狀態參考 Guardian live reports。球員總值採「高/中高/中/低」層級估算，未接入即時 Transfermarkt API。
+    </p>
+  </main>
+
+  <script>
+    const teams = [
+      {g:"A", n:"Mexico", zh:"墨西哥", value:7.0, hist:7.3, form:7.2},
+      {g:"A", n:"South Korea", zh:"韓國", value:6.8, hist:6.8, form:7.1},
+      {g:"A", n:"South Africa", zh:"南非", value:5.2, hist:4.9, form:5.4},
+      {g:"A", n:"Czech Republic", zh:"捷克", value:6.4, hist:6.7, form:6.2},
+      {g:"B", n:"Canada", zh:"加拿大", value:6.7, hist:5.0, form:6.8},
+      {g:"B", n:"Qatar", zh:"卡達", value:5.6, hist:4.7, form:5.8},
+      {g:"B", n:"Switzerland", zh:"瑞士", value:7.8, hist:7.3, form:7.5},
+      {g:"B", n:"Bosnia and Herzegovina", zh:"波士尼亞", value:6.3, hist:5.7, form:6.1},
+      {g:"C", n:"Brazil", zh:"巴西", value:9.5, hist:10.0, form:8.6},
+      {g:"C", n:"Morocco", zh:"摩洛哥", value:8.0, hist:7.6, form:8.1},
+      {g:"C", n:"Haiti", zh:"海地", value:4.7, hist:3.7, form:5.0},
+      {g:"C", n:"Scotland", zh:"蘇格蘭", value:6.9, hist:6.1, form:6.7},
+      {g:"D", n:"United States", zh:"美國", value:7.9, hist:6.7, form:8.2},
+      {g:"D", n:"Paraguay", zh:"巴拉圭", value:6.5, hist:6.8, form:6.4},
+      {g:"D", n:"Australia", zh:"澳洲", value:6.2, hist:6.4, form:6.8},
+      {g:"D", n:"Turkey", zh:"土耳其", value:7.2, hist:6.7, form:7.0},
+      {g:"E", n:"Germany", zh:"德國", value:9.1, hist:9.8, form:8.7},
+      {g:"E", n:"Curacao", zh:"庫拉索", value:4.4, hist:2.9, form:5.8},
+      {g:"E", n:"Ivory Coast", zh:"象牙海岸", value:7.2, hist:6.1, form:7.8},
+      {g:"E", n:"Ecuador", zh:"厄瓜多", value:7.4, hist:6.3, form:7.6},
+      {g:"F", n:"Netherlands", zh:"荷蘭", value:8.8, hist:8.6, form:8.3},
+      {g:"F", n:"Japan", zh:"日本", value:7.8, hist:6.9, form:8.0},
+      {g:"F", n:"Sweden", zh:"瑞典", value:7.4, hist:7.8, form:7.1},
+      {g:"F", n:"Tunisia", zh:"突尼西亞", value:6.0, hist:5.2, form:6.7},
+      {g:"G", n:"Belgium", zh:"比利時", value:8.2, hist:7.6, form:7.7},
+      {g:"G", n:"Egypt", zh:"埃及", value:7.2, hist:5.9, form:7.1},
+      {g:"G", n:"Iran", zh:"伊朗", value:6.8, hist:5.8, form:6.8},
+      {g:"G", n:"New Zealand", zh:"紐西蘭", value:4.9, hist:4.1, form:5.2},
+      {g:"H", n:"Spain", zh:"西班牙", value:9.4, hist:8.7, form:9.2},
+      {g:"H", n:"Cape Verde", zh:"維德角", value:5.3, hist:3.0, form:6.2},
+      {g:"H", n:"Saudi Arabia", zh:"沙烏地阿拉伯", value:5.8, hist:5.3, form:5.8},
+      {g:"H", n:"Uruguay", zh:"烏拉圭", value:8.3, hist:8.8, form:8.0},
+      {g:"I", n:"France", zh:"法國", value:9.7, hist:9.1, form:9.0},
+      {g:"I", n:"Senegal", zh:"塞內加爾", value:7.4, hist:6.4, form:7.4},
+      {g:"I", n:"Iraq", zh:"伊拉克", value:5.5, hist:4.7, form:6.0},
+      {g:"I", n:"Norway", zh:"挪威", value:8.0, hist:6.0, form:7.6},
+      {g:"J", n:"Argentina", zh:"阿根廷", value:9.2, hist:9.7, form:8.9},
+      {g:"J", n:"Algeria", zh:"阿爾及利亞", value:6.9, hist:6.2, form:6.9},
+      {g:"J", n:"Austria", zh:"奧地利", value:7.3, hist:6.8, form:7.5},
+      {g:"J", n:"Jordan", zh:"約旦", value:4.9, hist:3.2, form:5.9},
+      {g:"K", n:"Portugal", zh:"葡萄牙", value:9.2, hist:8.2, form:8.7},
+      {g:"K", n:"DR Congo", zh:"剛果民主共和國", value:6.2, hist:4.9, form:6.4},
+      {g:"K", n:"Uzbekistan", zh:"烏茲別克", value:5.9, hist:3.5, form:6.6},
+      {g:"K", n:"Colombia", zh:"哥倫比亞", value:8.0, hist:7.3, form:8.1},
+      {g:"L", n:"England", zh:"英格蘭", value:9.5, hist:8.8, form:8.8},
+      {g:"L", n:"Croatia", zh:"克羅埃西亞", value:8.1, hist:8.4, form:7.5},
+      {g:"L", n:"Ghana", zh:"迦納", value:6.7, hist:6.4, form:6.5},
+      {g:"L", n:"Panama", zh:"巴拿馬", value:5.2, hist:4.2, form:5.7}
+    ];
+
+    const matches = [
+      ["A","Mexico","South Africa",2,0,"done","6/11"],
+      ["A","South Korea","Czech Republic",2,1,"done","6/12"],
+      ["B","Canada","Bosnia and Herzegovina",1,1,"done","6/12"],
+      ["B","Qatar","Switzerland",1,1,"done","6/13"],
+      ["C","Brazil","Morocco",1,1,"done","6/13"],
+      ["C","Haiti","Scotland",0,1,"done","6/13"],
+      ["D","United States","Paraguay",4,1,"done","6/12"],
+      ["D","Australia","Turkey",2,0,"done","6/13"],
+      ["E","Germany","Curacao",7,1,"done","6/14"],
+      ["E","Ivory Coast","Ecuador",1,0,"done","6/14"],
+      ["F","Netherlands","Japan",2,2,"done","6/14"],
+      ["F","Sweden","Tunisia",1,0,"live","6/15 現場"],
+      ["G","Iran","New Zealand",null,null,"soon","6/15"],
+      ["G","Belgium","Egypt",null,null,"soon","6/15"],
+      ["H","Saudi Arabia","Uruguay",null,null,"soon","6/15"],
+      ["H","Spain","Cape Verde",null,null,"soon","6/15"],
+      ["I","France","Senegal",null,null,"soon","6/16"],
+      ["I","Iraq","Norway",null,null,"soon","6/16"],
+      ["J","Argentina","Algeria",null,null,"soon","6/16"],
+      ["J","Austria","Jordan",null,null,"soon","6/16"],
+      ["K","Portugal","DR Congo",null,null,"soon","6/17"],
+      ["K","Uzbekistan","Colombia",null,null,"soon","6/17"],
+      ["L","England","Croatia",null,null,"soon","6/17"],
+      ["L","Ghana","Panama",null,null,"soon","6/17"]
+    ];
+
+    const groupOrder = [...new Set(teams.map(t => t.g))];
+    const groups = Object.fromEntries(groupOrder.map(g => [g, teams.filter(t => t.g === g)]));
+
+    function team(name) { return teams.find(t => t.n === name); }
+    function basePower(t) {
+      return Math.round((t.value * .42 + t.hist * .28 + t.form * .30) * 10) / 10;
+    }
+    function sigmoid(x) { return 1 / (1 + Math.exp(-x)); }
+
+    const table = {};
+    teams.forEach(t => {
+      table[t.n] = { ...t, power: basePower(t), pld:0, w:0, d:0, l:0, gf:0, ga:0, gd:0, pts:0, liveNote:"" };
+    });
+
+    matches.forEach(m => {
+      const [g, a, b, as, bs, status] = m;
+      if (status === "soon" || as === null) return;
+      const A = table[a], B = table[b];
+      A.pld++; B.pld++;
+      A.gf += as; A.ga += bs; B.gf += bs; B.ga += as;
+      if (as > bs) { A.w++; B.l++; A.pts += 3; }
+      else if (as < bs) { B.w++; A.l++; B.pts += 3; }
+      else { A.d++; B.d++; A.pts++; B.pts++; }
+      A.gd = A.gf - A.ga; B.gd = B.gf - B.ga;
+      if (status === "live") {
+        A.liveNote = "現場領先"; B.liveNote = "現場落後";
+        A.power += .15; B.power -= .10;
+      } else {
+        const diff = as - bs;
+        A.power += Math.max(-.35, Math.min(.45, diff * .08));
+        B.power += Math.max(-.35, Math.min(.45, -diff * .08));
+      }
+    });
+
+    Object.values(table).forEach(t => {
+      const groupAvg = groups[t.g].reduce((sum, x) => sum + basePower(x), 0) / 4;
+      const groupEdge = sigmoid((t.power - groupAvg) * .9);
+      const pointsBoost = t.pts * .055 + t.gd * .025;
+      t.groupRate = Math.max(6, Math.min(94, Math.round((34 + groupEdge * 46 + pointsBoost * 100))));
+      t.r32Rate = Math.max(4, Math.min(91, Math.round(t.groupRate * .88)));
+      t.champRate = Math.max(.1, Math.round(Math.pow(t.power / 10, 5.8) * (t.groupRate / 100) * 24 * 10) / 10);
+      t.power = Math.max(1, Math.min(10, Math.round(t.power * 10) / 10));
+    });
+
+    function sortedGroup(g) {
+      return Object.values(table).filter(t => t.g === g).sort((a,b) =>
+        b.pts - a.pts || b.gd - a.gd || b.gf - a.gf || b.power - a.power
+      );
+    }
+
+    function projectedQualifiers() {
+      const firstSecond = [];
+      const thirds = [];
+      groupOrder.forEach(g => {
+        const s = sortedGroup(g);
+        firstSecond.push({ seed: `1${g}`, ...s[0] }, { seed: `2${g}`, ...s[1] });
+        thirds.push({ seed: `3${g}`, ...s[2] });
+      });
+      thirds.sort((a,b) => b.pts - a.pts || b.gd - a.gd || b.power - a.power);
+      return [...firstSecond, ...thirds.slice(0, 8)];
+    }
+
+    const groupPairings = [
+      [0, 1, "MD1"], [2, 3, "MD1"],
+      [0, 2, "MD2"], [3, 1, "MD2"],
+      [3, 0, "MD3"], [1, 2, "MD3"]
+    ];
+
+    const r32Seeds = [
+      ["2A", "2B"], ["1E", "3ABCDF"], ["1F", "2C"], ["1C", "2F"],
+      ["1I", "3CDFGH"], ["2E", "2I"], ["1A", "3CEFHI"], ["1L", "3EHIJK"],
+      ["1G", "3AEHIJ"], ["1D", "3BEFIJ"], ["1H", "2J"], ["2K", "2L"],
+      ["1B", "3EFGIJ"], ["2D", "2G"], ["1J", "2H"], ["1K", "3DEIJL"]
+    ];
+
+    function matchKey(a, b) {
+      return [a, b].sort().join("|");
+    }
+
+    function knownMatchMap() {
+      const map = new Map();
+      matches.forEach(m => {
+        const [g, a, b, as, bs, status, date] = m;
+        map.set(matchKey(a, b), { g, a, b, as, bs, status, date });
+      });
+      return map;
+    }
+
+    function allGroupMatches() {
+      const known = knownMatchMap();
+      return groupOrder.flatMap(g => {
+        const list = groups[g].map(t => t.n);
+        return groupPairings.map(([ai, bi, md]) => {
+          const a = list[ai], b = list[bi];
+          const saved = known.get(matchKey(a, b));
+          return saved || { g, a, b, as: null, bs: null, status: "soon", date: md };
+        });
+      });
+    }
+
+    function projectedSeedMap() {
+      const seedMap = {};
+      const thirds = [];
+      groupOrder.forEach(g => {
+        const s = sortedGroup(g);
+        seedMap[`1${g}`] = { seed: `1${g}`, ...s[0] };
+        seedMap[`2${g}`] = { seed: `2${g}`, ...s[1] };
+        thirds.push({ seed: `3${g}`, ...s[2] });
+      });
+      thirds.sort((a,b) => b.pts - a.pts || b.gd - a.gd || b.power - a.power);
+      return { seedMap, thirds };
+    }
+
+    function resolveSeed(seed, usedThirds, seedData) {
+      if (!seed.startsWith("3")) return seedData.seedMap[seed];
+      const allowed = seed.slice(1).split("");
+      const pick = seedData.thirds.find(t => allowed.includes(t.g) && !usedThirds.has(t.g));
+      if (pick) {
+        usedThirds.add(pick.g);
+        return pick;
+      }
+      const fallback = seedData.thirds.find(t => !usedThirds.has(t.g)) || seedData.thirds[0];
+      usedThirds.add(fallback.g);
+      return fallback;
+    }
+
+    function decideGame(a, b, score) {
+      if (score && score.status === "done" && score.as !== score.bs) {
+        const winnerName = score.as > score.bs ? score.a : score.b;
+        return { winner: team(winnerName) ? table[winnerName] : a, actual: true };
+      }
+      const chance = Math.round(sigmoid((a.power - b.power) * .95) * 100);
+      return { winner: chance >= 50 ? a : b, chance, actual: false };
+    }
+
+    function runKnockoutTree() {
+      const seedData = projectedSeedMap();
+      const usedThirds = new Set();
+      const knockoutScores = new Map();
+      const r32 = r32Seeds.map((pair, index) => {
+        const a = resolveSeed(pair[0], usedThirds, seedData);
+        const b = resolveSeed(pair[1], usedThirds, seedData);
+        const decision = decideGame(a, b, knockoutScores.get(`R32-${index}`));
+        return { round: "32強", label: `R32-${index + 1}`, a, b, ...decision };
+      });
+      const rounds = [r32];
+      ["16強", "8強", "4強", "決賽"].forEach(roundName => {
+        const previous = rounds[rounds.length - 1];
+        const current = [];
+        for (let i = 0; i < previous.length; i += 2) {
+          const a = previous[i].winner;
+          const b = previous[i + 1].winner;
+          const decision = decideGame(a, b);
+          current.push({ round: roundName, label: `${roundName}-${(i / 2) + 1}`, a, b, ...decision });
+        }
+        rounds.push(current);
+      });
+      return rounds;
+    }
+
+    const groupSelect = document.getElementById("groupFilter");
+    groupOrder.forEach(g => {
+      const opt = document.createElement("option");
+      opt.value = g; opt.textContent = `Group ${g}`;
+      groupSelect.appendChild(opt);
+    });
+
+    function renderStats(list) {
+      const avgPower = list.reduce((s,t) => s + t.power, 0) / list.length;
+      const favorite = [...list].sort((a,b) => b.champRate - a.champRate)[0];
+      const live = matches.filter(m => m[5] === "live").length;
+      const done = matches.filter(m => m[5] === "done").length;
+      const goals = matches.filter(m => m[5] !== "soon").reduce((s,m) => s + (m[3] || 0) + (m[4] || 0), 0);
+      document.getElementById("stats").innerHTML = [
+        [`${list.length}`, "目前顯示隊伍"],
+        [`${avgPower.toFixed(1)}`, "平均戰力"],
+        [`${favorite.zh}`, `最高奪冠率 ${favorite.champRate}%`],
+        [`${done}`, "已完賽"],
+        [`${goals}`, `已記錄進球，現場 ${live} 場`]
+      ].map(([a,b]) => `<div class="metric"><strong>${a}</strong><span>${b}</span></div>`).join("");
+    }
+
+    function renderGroups() {
+      const selected = groupSelect.value;
+      const visibleGroups = selected === "all" ? groupOrder : [selected];
+      document.getElementById("groups").innerHTML = visibleGroups.map(g => {
+        const rows = sortedGroup(g).map(t => `
+          <tr>
+            <td class="team-name">${t.zh}<br><span class="small">${t.n}</span></td>
+            <td class="num">${t.pts}</td>
+            <td class="num">${t.gd > 0 ? "+" : ""}${t.gd}</td>
+            <td class="num">${t.power}</td>
+            <td><div class="bar" title="小組出線率 ${t.groupRate}%"><i style="--w:${t.groupRate}%"></i></div></td>
+            <td class="num">${t.groupRate}%</td>
+          </tr>`).join("");
+        return `<div class="group">
+          <div class="group-title"><span>Group ${g}</span><span>${sortedGroup(g)[0].zh} 領先</span></div>
+          <table>
+            <thead><tr><th>隊伍</th><th class="num">Pts</th><th class="num">GD</th><th class="num">戰力</th><th>出線條</th><th class="num">率</th></tr></thead>
+            <tbody>${rows}</tbody>
+          </table>
+        </div>`;
+      }).join("");
+    }
+
+    function renderCards() {
+      const q = document.getElementById("search").value.trim().toLowerCase();
+      const selected = groupSelect.value;
+      const sort = document.getElementById("sortBy").value;
+      let list = Object.values(table).filter(t =>
+        (selected === "all" || t.g === selected) &&
+        (!q || t.n.toLowerCase().includes(q) || t.zh.includes(q))
+      );
+      const sortKey = sort === "power" ? "power" : sort === "group" ? "groupRate" : "champRate";
+      list.sort((a,b) => b[sortKey] - a[sortKey]);
+      renderStats(list.length ? list : Object.values(table));
+      document.getElementById("teamCards").innerHTML = list.map(t => `
+        <article class="team-card">
+          <div class="row">
+            <h3>${t.zh}</h3>
+            <span class="badge">Group ${t.g}</span>
+          </div>
+          <div class="small">${t.n}${t.liveNote ? " · " + t.liveNote : ""}</div>
+          <div class="split">
+            <div class="pill"><strong>${t.power}</strong>戰力</div>
+            <div class="pill"><strong>${t.groupRate}%</strong>小組</div>
+            <div class="pill"><strong>${t.champRate}%</strong>奪冠</div>
+          </div>
+          <div class="bar" title="奪冠率 ${t.champRate}%"><i style="--w:${Math.min(100, t.champRate * 5)}%"></i></div>
+          <p class="small">總值 ${t.value.toFixed(1)} / 歷史 ${t.hist.toFixed(1)} / 近期 ${t.form.toFixed(1)}</p>
+        </article>
+      `).join("") || `<p class="small" style="padding:12px;">沒有符合的隊伍。</p>`;
+    }
+
+    function renderMatches() {
+      document.getElementById("matches").innerHTML = matches.map(m => {
+        const [g,a,b,as,bs,status,date] = m;
+        const label = status === "done" ? "已完賽" : status === "live" ? "現場" : "未開賽";
+        const score = status === "soon" ? "vs" : `${as} - ${bs}`;
+        return `<div class="match">
+          <span class="status ${status}">${label}</span>
+          <div><strong>Group ${g}</strong> · ${team(a).zh} vs ${team(b).zh}<br><span class="small">${date} · ${a} / ${b}</span></div>
+          <div class="score">${score}</div>
+        </div>`;
+      }).join("");
+    }
+
+    function renderBracket() {
+      const allMatches = allGroupMatches();
+      const byGroup = Object.fromEntries(groupOrder.map(g => [g, allMatches.filter(m => m.g === g)]));
+
+      let matchNo = 1;
+      const groupStage = groupOrder.map(g => {
+        const nodes = byGroup[g].map(m => {
+          const A = team(m.a), B = team(m.b);
+          const hasScore = m.as !== null && m.bs !== null;
+          const statusText = m.status === "done" ? "已完賽" : m.status === "live" ? "現場" : "未開賽";
+          const winner = hasScore && m.as !== m.bs ? (m.as > m.bs ? A.zh : B.zh) : "";
+          const score = hasScore ? `${m.as} - ${m.bs}` : "尚無比分";
+          const node = `<div class="match-node ${m.status}">
+            <span class="node-id">第${String(matchNo).padStart(2, "0")}場</span>${statusText}<br>
+            <strong>${A.zh} vs ${B.zh}</strong><br>
+            <span class="small">${score} · 戰力 ${A.zh} ${table[m.a].power} / ${B.zh} ${table[m.b].power}</span>
+            ${winner ? `<br><span class="winner-line">本場勝方：${winner}</span>` : ""}
+          </div>`;
+          matchNo++;
+          return node;
+        }).join("");
+        return `<div class="group-tree">
+          <div class="group-tree-title">第 ${g} 組</div>
+          ${nodes}
+        </div>`;
+      }).join("");
+
+      const rankingNodes = groupOrder.map(g => {
+        const s = sortedGroup(g);
+        const groupDone = byGroup[g].every(m => m.status === "done");
+        return `<div class="rank-node">
+          <strong>第 ${g} 組目前排名${groupDone ? " · 已完成" : ""}</strong><br>
+          ${s.map((t, i) => {
+            const locked = groupDone && i < 2;
+            return `<span class="${locked ? "winner-line" : ""}">${i + 1}. ${t.zh} · ${t.pts} 分 · GD ${t.gd > 0 ? "+" : ""}${t.gd}${locked ? " · 已晉級" : ""}</span>`;
+          }).join("<br>")}
+        </div>`;
+      }).join("");
+
+      const knockoutRounds = [
+        ["32強", 73, 16],
+        ["16強", 89, 8],
+        ["8強", 97, 4],
+        ["4強", 101, 2],
+        ["季軍戰", 103, 1],
+        ["決賽", 104, 1]
+      ];
+      const knockoutNodes = knockoutRounds.map(([round, start, count]) => `
+        <div class="group-tree">
+          <div class="group-tree-title">${round}</div>
+          <div class="ko-grid">
+            ${Array.from({ length: count }, (_, i) => `
+              <div class="ko-node ${round === "決賽" ? "final-node" : ""}">
+                <span class="node-id">第${start + i}場</span><br>
+                <strong>${round}</strong><br>
+                <span class="small">待實際晉級隊伍產生</span>
+              </div>`).join("")}
+          </div>
+        </div>`).join("");
+
+      document.getElementById("bracket").innerHTML = `
+        <div class="full-match-tree">
+          <div class="tree-stage">
+            <h3>小組賽全部對戰：第 01-72 場</h3>
+            <div class="group-tree-grid">${groupStage}</div>
+          </div>
+          <div class="tree-stage">
+            <h3>目前排名與實際晉級</h3>
+            ${rankingNodes}
+          </div>
+          <div class="tree-stage">
+            <h3>淘汰賽場次：第 73-104 場</h3>
+            ${knockoutNodes}
+          </div>
+        </div>`;
+    }
+
+    function render() {
+      renderGroups();
+      renderCards();
+      renderMatches();
+      renderBracket();
+    }
+
+    document.getElementById("search").addEventListener("input", renderCards);
+    groupSelect.addEventListener("change", render);
+    document.getElementById("sortBy").addEventListener("change", renderCards);
+    document.getElementById("reset").addEventListener("click", () => {
+      document.getElementById("search").value = "";
+      groupSelect.value = "all";
+      document.getElementById("sortBy").value = "champ";
+      render();
+    });
+
+    render();
+    setInterval(() => {
+      if (!document.hidden) location.reload();
+    }, 10 * 60 * 1000);
+  </script>
+</body>
+</html>
