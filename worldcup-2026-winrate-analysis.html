@@ -20,16 +20,19 @@
     }
 
     * { box-sizing: border-box; }
+    html {
+      min-height: 100%;
+      background: #07100f;
+    }
+
     body {
       margin: 0;
       min-height: 100vh;
       color: var(--ink);
       font-family: "Microsoft JhengHei", "Noto Sans TC", system-ui, -apple-system, sans-serif;
-      background:
-        linear-gradient(180deg, rgba(7, 16, 15, .74) 0%, rgba(21, 34, 31, .54) 34%, rgba(238, 244, 239, .72) 100%),
-        radial-gradient(circle at top left, rgba(28, 163, 154, .24), transparent 32rem),
-        url("assets/worldcup-stadium-bg.png") center top / cover fixed no-repeat,
-        linear-gradient(180deg, #f7faf7 0%, var(--bg) 58%, #edf2ef 100%);
+      background: transparent;
+      position: relative;
+      isolation: isolate;
     }
 
     body::before {
@@ -48,8 +51,8 @@
       z-index: -1;
       pointer-events: none;
       background:
-        linear-gradient(180deg, rgba(7, 16, 15, .70) 0%, rgba(21, 34, 31, .46) 36%, rgba(238, 244, 239, .70) 100%),
-        radial-gradient(circle at 12% 8%, rgba(28, 163, 154, .22), transparent 34rem);
+        linear-gradient(180deg, rgba(7, 16, 15, .62) 0%, rgba(21, 34, 31, .34) 34%, rgba(10, 21, 18, .50) 100%),
+        radial-gradient(circle at 12% 8%, rgba(28, 163, 154, .18), transparent 34rem);
     }
 
     header {
@@ -102,6 +105,8 @@
       max-width: 1600px;
       margin: 0 auto;
       padding: 22px clamp(16px, 3vw, 42px) 42px;
+      position: relative;
+      z-index: 1;
     }
 
     .toolbar {
@@ -114,12 +119,13 @@
     input, select, button {
       width: 100%;
       border: 1px solid var(--line);
-      background: #fff;
+      background: rgba(255, 255, 255, .88);
       color: var(--ink);
       border-radius: 8px;
       padding: 11px 12px;
       font: inherit;
       min-height: 44px;
+      backdrop-filter: blur(8px);
     }
 
     button {
@@ -137,11 +143,12 @@
     }
 
     .metric {
-      background: var(--panel);
+      background: linear-gradient(135deg, rgba(255, 255, 255, .90), rgba(239, 248, 244, .72));
       border: 1px solid var(--line);
       border-radius: 8px;
       padding: 14px;
       box-shadow: var(--shadow);
+      backdrop-filter: blur(10px);
     }
 
     .metric strong {
@@ -160,11 +167,12 @@
     }
 
     section {
-      background: rgba(255, 255, 255, .74);
+      background: linear-gradient(135deg, rgba(255, 255, 255, .82), rgba(234, 244, 239, .54));
       border: 1px solid var(--line);
       border-radius: 8px;
       box-shadow: var(--shadow);
       overflow: hidden;
+      backdrop-filter: blur(10px);
     }
 
     .section-head {
@@ -174,7 +182,7 @@
       align-items: center;
       padding: 14px 16px;
       border-bottom: 1px solid var(--line);
-      background: rgba(255, 255, 255, .8);
+      background: linear-gradient(90deg, rgba(255, 255, 255, .86), rgba(235, 246, 241, .62));
     }
 
     h2 {
@@ -199,8 +207,9 @@
     .group {
       border: 1px solid var(--line);
       border-radius: 8px;
-      background: #fff;
+      background: linear-gradient(135deg, rgba(255, 255, 255, .88), rgba(240, 248, 244, .56));
       overflow: hidden;
+      backdrop-filter: blur(8px);
     }
 
     .group-title {
@@ -208,7 +217,7 @@
       justify-content: space-between;
       align-items: center;
       padding: 10px 12px;
-      background: #eef5f1;
+      background: linear-gradient(90deg, rgba(238, 245, 241, .90), rgba(238, 245, 241, .58));
       border-bottom: 1px solid var(--line);
       font-weight: 700;
     }
@@ -246,7 +255,7 @@
       padding: 4px 8px;
       font-size: .75rem;
       color: var(--muted);
-      background: #fff;
+      background: rgba(255, 255, 255, .82);
     }
     .status::before {
       content: "";
@@ -286,8 +295,9 @@
     .team-card {
       border: 1px solid var(--line);
       border-radius: 8px;
-      background: #fff;
+      background: linear-gradient(145deg, rgba(255, 255, 255, .90), rgba(239, 248, 244, .56));
       padding: 12px;
+      backdrop-filter: blur(8px);
     }
 
     .team-card .row {
@@ -326,7 +336,7 @@
     }
 
     .pill {
-      background: #f3f6f4;
+      background: rgba(243, 246, 244, .74);
       border-radius: 8px;
       padding: 8px;
       text-align: center;
@@ -355,8 +365,9 @@
       padding: 10px;
       border: 1px solid var(--line);
       border-radius: 8px;
-      background: #fff;
+      background: linear-gradient(135deg, rgba(255, 255, 255, .88), rgba(238, 247, 243, .54));
       font-size: .86rem;
+      backdrop-filter: blur(8px);
     }
 
     .score {
@@ -444,7 +455,7 @@
     .tree-match {
       border: 1px solid var(--line);
       border-radius: 8px;
-      background: #fff;
+      background: linear-gradient(135deg, rgba(255, 255, 255, .88), rgba(238, 246, 242, .58));
       padding: 8px;
       font-size: .76rem;
       line-height: 1.35;
@@ -487,7 +498,7 @@
       min-width: 1120px;
       height: auto;
       display: block;
-      background: #f7f6f3;
+      background: linear-gradient(135deg, rgba(247, 246, 243, .82), rgba(229, 238, 233, .48));
       border: 1px solid #e2e0dc;
       border-radius: 8px;
     }
@@ -543,9 +554,10 @@
     .tree-stage {
       border: 1px solid var(--line);
       border-radius: 8px;
-      background: #f7f6f3;
+      background: linear-gradient(145deg, rgba(247, 246, 243, .80), rgba(232, 243, 238, .46));
       padding: 12px;
       position: relative;
+      backdrop-filter: blur(9px);
     }
 
     .tree-stage h3 {
@@ -562,7 +574,7 @@
     .group-tree {
       border: 1px solid #d8ddd9;
       border-radius: 8px;
-      background: #fff;
+      background: linear-gradient(145deg, rgba(255, 255, 255, .86), rgba(238, 247, 243, .50));
       padding: 8px;
     }
 
@@ -576,7 +588,7 @@
     .match-node {
       border: 1px solid #cfd6d2;
       border-radius: 6px;
-      background: #f4f6f5;
+      background: linear-gradient(135deg, rgba(244, 246, 245, .88), rgba(236, 245, 241, .58));
       padding: 7px;
       margin: 6px 0;
       font-size: .74rem;
@@ -586,12 +598,12 @@
 
     .match-node.done {
       border-color: rgba(14, 124, 102, .45);
-      background: #eff8f5;
+      background: linear-gradient(135deg, rgba(239, 248, 245, .90), rgba(220, 242, 234, .56));
     }
 
     .match-node.live {
       border-color: rgba(217, 155, 33, .55);
-      background: #fff8e8;
+      background: linear-gradient(135deg, rgba(255, 248, 232, .92), rgba(253, 237, 199, .58));
     }
 
     .node-id {
@@ -611,7 +623,7 @@
     .rank-node {
       border: 1px solid #d8ddd9;
       border-radius: 8px;
-      background: #fff;
+      background: linear-gradient(145deg, rgba(255, 255, 255, .88), rgba(238, 247, 243, .52));
       padding: 9px;
       margin-bottom: 8px;
       font-size: .77rem;
@@ -628,7 +640,7 @@
       min-height: 58px;
       border: 1px solid #cfd6d2;
       border-radius: 6px;
-      background: #fff;
+      background: linear-gradient(145deg, rgba(255, 255, 255, .88), rgba(238, 247, 243, .48));
       padding: 8px;
       font-size: .74rem;
       line-height: 1.35;
@@ -636,7 +648,7 @@
 
     .ko-node.final-node {
       border-color: rgba(217, 155, 33, .6);
-      background: #fffaf0;
+      background: linear-gradient(145deg, rgba(255, 250, 240, .90), rgba(251, 230, 184, .52));
     }
 
     .sources {
